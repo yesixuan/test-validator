@@ -1,40 +1,81 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+    <form ref="myForm" v-validate="validateData">
+      <!--<OwnerInput label="姓名" v-model="formData.name" />-->
+      <!--<OwnerInput label="电话" v-model="formData.tel" />-->
+      <input placeholder="姓名" v-model="formData.name" name="name" />
+      <input placeholder="电话" v-model="formData.tel" name="tel" />
+      <select name="habit" v-model="formData.habit">
+        <option value="">吃饭</option>
+        <option value="1">睡觉</option>
+        <option value="2">打豆豆</option>
+      </select>
+    </form>
+    <OwnerBtn text="保存" v-check-submit="submit" />
+    <!--<button v-check-submit="submit">保存</button>-->
   </div>
 </template>
 
 <script>
+import OwnerInput from './OwnerInput'
+import OwnerBtn from './OwnerBtn'
 export default {
   name: 'HelloWorld',
-  props: {
-    msg: String
+  components: {
+    OwnerInput,
+    OwnerBtn
+  },
+  data() {
+    return {
+      vic: {},
+      formData: {
+        name: '',
+        tel: '',
+        habit: ''
+      }
+    }
+  },
+  methods: {
+    submit() {
+      console.log(JSON.parse(JSON.stringify(this.vic)))
+    }
+  },
+  created() {
+    this.validateData = {
+      validateKey: 'vic',
+      ref: 'myForm',
+      formData: 'formData',
+      fields: [ 'name', 'tel', 'habit' ],
+      rules: {
+        name: {
+          name: 'name',
+          validator: [
+            {
+              fun: val => /^\d+$/.test(val),
+              msg: '只接受数字'
+            }
+          ]
+        },
+        tel: {
+          name: 'tel',
+          validator: [
+            {
+              fun: val => /^\d{10}$/.test(val),
+              msg: '只接受数字'
+            }
+          ]
+        },
+        habit: {
+          name: 'habit',
+          validator: [
+            {
+              fun: val => val !== '',
+              msg: '必填'
+            }
+          ]
+        }
+      }
+    }
   }
 }
 </script>

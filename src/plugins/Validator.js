@@ -35,7 +35,7 @@ export default class Validator {
       msg: '校验通过'
     }
     // console.log(ValidatePlugin.validation)
-    this.vm.$set(this.vm[this.validateKey], this.rules.name, res)
+    this.vm.$set(this.vm[this.validateKey], name, res)
     return res
   }
 

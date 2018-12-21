@@ -56,7 +56,7 @@ export default {
         tel: [
           {
             fun: val => /^\d{10}$/.test(val),
-            msg: '只接受数字'
+            msg: '只接受10位数字'
           }
         ],
         habit: [

@@ -16,17 +16,17 @@ export default class Validator {
    * @param rules
    * @returns {*}
    */
-  verify(val, rules) {
+  verify(val, rules, name) {
     let res = {}
-    for (let i = 0; i < rules.validator.length; i++) {
-      let rule = rules.validator[i]
+    for (let i = 0; i < rules.length; i++) {
+      let rule = rules[i]
       if (!rule.fun(val)) {
         res = {
           pass: false,
           msg: rule.msg || '默认校验不通过消息'
         }
         // vm.$data.vic = { [rules.name]: res }
-        this.vm.$set(this.vm[this.validateKey], rules.name, res)
+        this.vm.$set(this.vm[this.validateKey], name, res)
         return res
       }
     }
@@ -48,7 +48,7 @@ export default class Validator {
       pass: true
     }
     this.fields.forEach(item => {
-      const checkOne = this.verify(this.formData[item], this.rules[item])
+      const checkOne = this.verify(this.formData[item], this.rules[item], item)
       if (!checkOne.pass && res.pass) {
         res = { ...checkOne, name: item }
       }
@@ -58,7 +58,7 @@ export default class Validator {
 
   initEvent() {
     this.ref.addEventListener('change', e => {
-      this.verify(e.target.value, this.rules[e.target.name])
+      this.verify(e.target.value, this.rules[e.target.name], e.target.name)
     })
     // 当鼠标聚焦时，这个表单元素需要正常
     this.ref.addEventListener('click', ({ target }) => { // 用 click 来模拟 focus 事件

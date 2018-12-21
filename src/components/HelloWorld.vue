@@ -47,33 +47,24 @@ export default {
       formData: 'formData',
       fields: [ 'name', 'tel', 'habit' ],
       rules: {
-        name: {
-          name: 'name',
-          validator: [
-            {
-              fun: val => /^\d+$/.test(val),
-              msg: '只接受数字'
-            }
-          ]
-        },
-        tel: {
-          name: 'tel',
-          validator: [
-            {
-              fun: val => /^\d{10}$/.test(val),
-              msg: '只接受数字'
-            }
-          ]
-        },
-        habit: {
-          name: 'habit',
-          validator: [
-            {
-              fun: val => val !== '',
-              msg: '必填'
-            }
-          ]
-        }
+        name: [
+          {
+            fun: val => /^\d+$/.test(val),
+            msg: '只接受数字'
+          }
+        ],
+        tel: [
+          {
+            fun: val => /^\d{10}$/.test(val),
+            msg: '只接受数字'
+          }
+        ],
+        habit: [
+          {
+            fun: val => val !== '',
+            msg: '必填'
+          }
+        ]
       }
     }
   }

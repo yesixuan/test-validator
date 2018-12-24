@@ -8,6 +8,7 @@ export default class Validator {
     this.rules = rules
     this.validateKey = validateKey
     this.submitMethod = this.vm[arg]
+    this.prevTarget = null
     this.initEvent(el)
   }
 
@@ -65,13 +66,20 @@ export default class Validator {
     this.ref.addEventListener('click', ({ target }) => { // 用 click 来模拟 focus 事件
       if (target.nodeName === 'INPUT' || target.nodeName === 'SELECT' || target.nodeName === 'TEXTAREA') {
         this.vm.$set(this.vm[this.validateKey], target.name, { pass: true })
+        this.prevTarget = target
       }
-    })
+    }, true)
     // 绑定提交事件
     el.addEventListener('click', () => {
       const res = this.checkAll()
       console.log(res)
       this.submitMethod()
     })
+    // 模拟 blur 事件
+    window.addEventListener('click', e => {
+      if (e.target !== this.prevTarget && this.prevTarget !== null) {
+        this.verify(this.prevTarget.value, this.rules[this.prevTarget.name], this.prevTarget.name)
+      }
+    }, true)
   }
 }

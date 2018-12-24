@@ -1,3 +1,5 @@
+import defaultRules from './Rules'
+
 export default class Validator {
   constructor(el, { arg, value, value: { fields, rules, validateKey }, modifiers }, { context }) {
     this.vm = context
@@ -15,16 +17,52 @@ export default class Validator {
   }
 
   /**
+   * 验证 validator 的值类型，将其统一包装成函数
+   * @param validator
+   * @returns Function
+   */
+  createRegValidator(validator) {
+    if (typeof validator === 'string') {
+      try {
+        return defaultRules.rules[validator]
+      } catch (e) {
+        throw `您还未定义 ${validator} 这条规则`
+      }
+    } else if (validator instanceof RegExp) {
+      return val => validator.test(val)
+    } else if (typeof validator === 'function') {
+      return validator
+    } else {
+      throw 'validator 的值只能为函数或正则表达式'
+    }
+  }
+
+  /**
    * 检验某个字段的校验是否通过
    * @param val
    * @param rules
+   * @param name
    * @returns {*}
    */
   verify(val, rules, name) {
     let res = {}
     for (let i = 0; i < rules.length; i++) {
       let rule = rules[i]
-      if (!rule.fun(val)) {
+      if (val === '' && rules.every(rule => !rule.required)) {
+        res = {
+          pass: true,
+          msg: '校验通过'
+        }
+        this.vm.$set(this.vm[this.validateKey], name, res)
+        return res
+      } else if (rules.some(rule => rule.required) && val === '') {
+        res = {
+          pass: false,
+          msg: '必填'
+        }
+        this.vm.$set(this.vm[this.validateKey], name, res)
+        return res
+      } else if (rule.validator && !this.createRegValidator(rule.validator)(val)) {
         res = {
           pass: false,
           msg: rule.msg || '默认校验不通过消息'

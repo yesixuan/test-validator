@@ -58,19 +58,23 @@ export default {
       rules: {
         name: [
           {
-            fun: val => /^\d+$/.test(val),
+            required: true,
+            msg: '只接受数字'
+          },
+          {
+            validator: val => /^\d+$/.test(val),
             msg: '只接受数字'
           }
         ],
         tel: [
           {
-            fun: val => /^\d{10}$/.test(val),
-            msg: '只接受10位数字'
+            validator: 'mobile',
+            msg: '请输入正确的手机号码'
           }
         ],
         habit: [
           {
-            fun: val => val !== '',
+            validator: val => val !== '',
             msg: '必填'
           }
         ]

@@ -1,4 +1,4 @@
-import defaultRules from './Rules'
+export { default as defaultRules } from './Rules' // 默认名改成具名导出
 
 export default class Validator {
   constructor(el, { arg, value, value: { fields, rules, validateKey }, modifiers }, { context }) {
@@ -100,34 +100,53 @@ export default class Validator {
     return res
   }
 
-  initEvent(el) {
-    this.ref.addEventListener('change', e => {
-      this.verify(e.target.value, this.rules[e.target.name], e.target.name)
-    })
-    // 当鼠标聚焦时，这个表单元素需要正常
-    this.ref.addEventListener('click', ({ target }) => { // 用 click 来模拟 focus 事件
-      if (target.nodeName === 'INPUT' || target.nodeName === 'SELECT' || target.nodeName === 'TEXTAREA') {
-        this.vm.$set(this.vm[this.validateKey], target.name, { pass: true })
-        this.prevTarget = target
-      }
-    }, true)
-    // 绑定提交事件
-    el.addEventListener('click', e => {
-      e.preventDefault()
-      if (this.autoCatch) {
-        const { pass } = this.checkAll()
-        if (pass) {
-          this.submitMethod()
-        }
-      } else {
+  /**
+   * 这样定义方法才能保证该方法被添作事件监听者的时候 this 的指向符合预期
+   * @param e
+   */
+  changeListener = e => {
+    this.verify(e.target.value, this.rules[e.target.name], e.target.name)
+  }
+
+  focusListener = ({ target }) => {
+    if (target.nodeName === 'INPUT' || target.nodeName === 'SELECT' || target.nodeName === 'TEXTAREA') {
+      this.vm.$set(this.vm[this.validateKey], target.name, { pass: true })
+      this.prevTarget = target
+    }
+  }
+
+  submitListener = e => {
+    e.preventDefault()
+    if (this.autoCatch) {
+      const { pass } = this.checkAll()
+      if (pass) {
         this.submitMethod()
       }
-    })
+    } else {
+      this.submitMethod()
+    }
+  }
+
+  blurListener = e => {
+    if (e.target !== this.prevTarget && this.prevTarget !== null) {
+      this.verify(this.prevTarget.value, this.rules[this.prevTarget.name], this.prevTarget.name)
+    }
+  }
+
+  initEvent(el) {
+    this.ref.addEventListener('change', this.changeListener)
+    // 当鼠标聚焦时，这个表单元素需要正常
+    this.ref.addEventListener('click', this.focusListener, true)
+    // 绑定提交事件
+    el.addEventListener('click', this.submitListener)
     // 模拟 blur 事件
-    window.addEventListener('click', e => {
-      if (e.target !== this.prevTarget && this.prevTarget !== null) {
-        this.verify(this.prevTarget.value, this.rules[this.prevTarget.name], this.prevTarget.name)
-      }
-    }, true)
+    window.addEventListener('click', this.blurListener, true)
+  }
+
+  unbindEvent(el) {
+    this.ref.removeEventListener('change', this.changeListener)
+    this.ref.removeEventListener('click', this.focusListener, true)
+    el.removeEventListener('click', this.submitListener)
+    window.removeEventListener('click', this.blurListener, true)
   }
 }

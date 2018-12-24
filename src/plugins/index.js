@@ -1,4 +1,5 @@
 import Validator from './Validator'
+export { defaultRules } from './Validator'
 
 export default  class ValidatePlugin {
   constructor() {
@@ -17,7 +18,8 @@ export default  class ValidatePlugin {
         ValidatePlugin.createValidator(ValidatePlugin, el, binding, vNode)
       },
       unbind(el, binding, { context }) {
-        // 还原校验对象
+        // 解绑事件
+        ValidatePlugin.validators[context._uid].unbindEvent(el)
         // 通过组件的 id 来区分不同的表单
         ValidatePlugin.validators[context._uid] = null
       }

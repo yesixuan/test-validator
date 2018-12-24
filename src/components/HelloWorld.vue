@@ -10,10 +10,10 @@
         <option value="1">睡觉</option>
         <option value="2">打豆豆</option>
       </select>
+      <OwnerBtn text="保存" v-validate:submit.autoCatch="validateData" />
     </form>
-    <OwnerBtn text="保存" v-validate:submit="validateData" />
     <!--<button v-check-submit="submit">保存</button>-->
-    <br>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br>
     {{ JSON.parse(JSON.stringify(this.vic)) }}
   </div>
 </template>
@@ -44,7 +44,9 @@ export default {
   },
   methods: {
     submit() {
-      console.log(JSON.parse(JSON.stringify(this.vic)))
+      // const res = this.$refs.myForm.validator()
+      // console.log(JSON.parse(JSON.stringify(this.vic)))
+      console.log('执行 submit 方法')
     }
   },
   created() {

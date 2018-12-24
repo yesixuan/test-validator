@@ -1,12 +1,14 @@
 export default class Validator {
-  constructor(el, { arg, value, value: { fields, rules, validateKey } }, { context }) {
+  constructor(el, { arg, value, value: { fields, rules, validateKey }, modifiers }, { context }) {
     this.vm = context
     this.inputValue = value
     this.ref = context.$refs[value.ref]
+    this.ref.validator = this.checkAll.bind(this) // 让组件本身可以校验所有数据
     this.formData = context[value.formData]
     this.fields = fields
     this.rules = rules
     this.validateKey = validateKey
+    this.autoCatch = !!modifiers.autoCatch
     this.submitMethod = this.vm[arg]
     this.prevTarget = null
     this.initEvent(el)
@@ -70,10 +72,16 @@ export default class Validator {
       }
     }, true)
     // 绑定提交事件
-    el.addEventListener('click', () => {
-      const res = this.checkAll()
-      console.log(res)
-      this.submitMethod()
+    el.addEventListener('click', e => {
+      e.preventDefault()
+      if (this.autoCatch) {
+        const { pass } = this.checkAll()
+        if (pass) {
+          this.submitMethod()
+        }
+      } else {
+        this.submitMethod()
+      }
     })
     // 模拟 blur 事件
     window.addEventListener('click', e => {

@@ -1,5 +1,5 @@
 export default class Validator {
-  constructor(el, { value, value: { fields, rules, validateKey } }, { context }) {
+  constructor(el, { arg, value, value: { fields, rules, validateKey } }, { context }) {
     this.vm = context
     this.inputValue = value
     this.ref = context.$refs[value.ref]
@@ -7,7 +7,8 @@ export default class Validator {
     this.fields = fields
     this.rules = rules
     this.validateKey = validateKey
-    this.initEvent()
+    this.submitMethod = this.vm[arg]
+    this.initEvent(el)
   }
 
   /**
@@ -56,7 +57,7 @@ export default class Validator {
     return res
   }
 
-  initEvent() {
+  initEvent(el) {
     this.ref.addEventListener('change', e => {
       this.verify(e.target.value, this.rules[e.target.name], e.target.name)
     })
@@ -66,13 +67,11 @@ export default class Validator {
         this.vm.$set(this.vm[this.validateKey], target.name, { pass: true })
       }
     })
-  }
-
-  bindSubmitEvent(el, action) {
+    // 绑定提交事件
     el.addEventListener('click', () => {
       const res = this.checkAll()
       console.log(res)
-      action()
+      this.submitMethod()
     })
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <form ref="myForm" v-validate="validateData">
+    <form ref="myForm">
       <!--<OwnerInput label="姓名" v-model="formData.name" />-->
       <!--<OwnerInput label="电话" v-model="formData.tel" />-->
       <input placeholder="姓名" v-model="formData.name" name="name" />
@@ -11,7 +11,7 @@
         <option value="2">打豆豆</option>
       </select>
     </form>
-    <OwnerBtn text="保存" v-check-submit="submit" />
+    <OwnerBtn text="保存" v-validate:submit="validateData" />
     <!--<button v-check-submit="submit">保存</button>-->
     <br>
     {{ JSON.parse(JSON.stringify(this.vic)) }}

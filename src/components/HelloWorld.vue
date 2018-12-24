@@ -6,13 +6,15 @@
       <input placeholder="姓名" v-model="formData.name" name="name" />
       <input placeholder="电话" v-model="formData.tel" name="tel" />
       <select name="habit" v-model="formData.habit">
-        <option value="">吃饭</option>
+        <option value="">空</option>
         <option value="1">睡觉</option>
         <option value="2">打豆豆</option>
       </select>
     </form>
     <OwnerBtn text="保存" v-check-submit="submit" />
     <!--<button v-check-submit="submit">保存</button>-->
+    <br>
+    {{ JSON.parse(JSON.stringify(this.vic)) }}
   </div>
 </template>
 
@@ -33,6 +35,11 @@ export default {
         tel: '',
         habit: ''
       }
+    }
+  },
+  computed: {
+    test() {
+      return 'hehe'
     }
   },
   methods: {
@@ -67,6 +74,9 @@ export default {
         ]
       }
     }
+  },
+  mounted() {
+    console.log(this)
   }
 }
 </script>

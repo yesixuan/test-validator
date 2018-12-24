@@ -1,5 +1,5 @@
 import Validator from './Validator'
-export { defaultRules } from './Validator'
+export { rules } from './Validator'
 
 export default  class ValidatePlugin {
   constructor() {

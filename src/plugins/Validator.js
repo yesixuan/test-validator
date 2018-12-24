@@ -1,4 +1,5 @@
-export { default as defaultRules } from './Rules' // 默认名改成具名导出
+import defaultRules from './Rules' // 默认名改成具名导出
+// console.log(rules)
 
 export default class Validator {
   constructor(el, { arg, value, value: { fields, rules, validateKey }, modifiers }, { context }) {
@@ -150,3 +151,5 @@ export default class Validator {
     window.removeEventListener('click', this.blurListener, true)
   }
 }
+
+export const rules = defaultRules

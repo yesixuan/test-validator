@@ -37,6 +37,22 @@ export default class Validator {
     }
   }
 
+  createValidateData(target, name, res) {
+    target = res
+    this.vm.$set(this.vm[this.validateKey], name, target)
+  }
+
+  /**
+   * 创建错误信息数据的偏函数（提前接收两个固定参数）
+   * @param args
+   * @returns {function(*=): void}
+   */
+  partialCreateValidateData(...args) {
+    return res => {
+      return this.createValidateData(...args, res)
+    }
+  }
+
   /**
    * 检验某个字段的校验是否通过
    * @param val
@@ -46,38 +62,24 @@ export default class Validator {
    */
   verify(val, rules, name) {
     let res = {}
+    const required = rules.some(rule => rule.validator === 'required')
+    const handler = this.partialCreateValidateData(res, name)
     for (let i = 0; i < rules.length; i++) {
       let rule = rules[i]
-      if (val === '' && rules.every(rule => !rule.required)) {
-        res = {
-          pass: true,
-          msg: '校验通过'
-        }
-        this.vm.$set(this.vm[this.validateKey], name, res)
+      if (val === '' && !required) {
+        handler({ pass: true, msg: '校验通过' })
         return res
-      } else if (rules.some(rule => rule.required) && val === '') {
-        res = {
-          pass: false,
-          msg: '必填'
-        }
-        this.vm.$set(this.vm[this.validateKey], name, res)
+      }
+      if (required && val === '') {
+        handler({ pass: false, msg: '必填' })
         return res
-      } else if (rule.validator && !this.createRegValidator(rule.validator)(val)) {
-        res = {
-          pass: false,
-          msg: rule.msg || '默认校验不通过消息'
-        }
-        // vm.$data.vic = { [rules.name]: res }
-        this.vm.$set(this.vm[this.validateKey], name, res)
+      }
+      if (val !== '' && rule.validator !== 'required' && !this.createRegValidator(rule.validator)(val)) {
+        handler({ pass: false, msg: rule.msg || '默认校验不通过消息' })
         return res
       }
     }
-    res = {
-      pass: true,
-      msg: '校验通过'
-    }
-    // console.log(ValidatePlugin.validation)
-    this.vm.$set(this.vm[this.validateKey], name, res)
+    handler({ pass: true, msg: '校验通过' })
     return res
   }
 

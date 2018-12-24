@@ -58,7 +58,7 @@ export default {
       rules: {
         name: [
           {
-            required: true,
+            validator: 'required',
             msg: '只接受数字'
           },
           {

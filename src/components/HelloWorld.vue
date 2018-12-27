@@ -1,20 +1,23 @@
 <template>
   <div class="hello">
     <form ref="myForm">
-      <!--<OwnerInput label="姓名" v-model="formData.name" />-->
-      <!--<OwnerInput label="电话" v-model="formData.tel" />-->
-      <input placeholder="姓名" v-model="formData.name" name="name" />
-      <input placeholder="电话" v-model="formData.tel" name="tel" />
-      <select name="habit" v-model="formData.habit">
+      <input placeholder="姓名" v-model="formData.name" name="name" :class="{ error: $isError('name') }" />
+      <br>
+      <input placeholder="电话" v-model="formData.tel" name="tel" :class="{ error: $isError('tel') }" />
+      <br>
+      <select name="habit" v-model="formData.habit" :class="{ error: $isError('habit') }">
         <option value="">空</option>
         <option value="1">睡觉</option>
         <option value="2">打豆豆</option>
       </select>
+      <br>
       <OwnerBtn text="保存" v-validate:submit.autoCatch="validateData" />
     </form>
     <!--<button v-check-submit="submit">保存</button>-->
     <br><br><br><br><br><br><br><br><br><br><br><br><br>
-    {{ JSON.parse(JSON.stringify(this.vic)) }}
+    {{ JSON.parse(JSON.stringify($verify('name'))) }}<br>
+    {{ JSON.parse(JSON.stringify($verify('tel'))) }}<br>
+    {{ JSON.parse(JSON.stringify($verify('habit'))) }}
   </div>
 </template>
 
@@ -29,7 +32,7 @@ export default {
   },
   data() {
     return {
-      vic: {},
+      show: true,
       formData: {
         name: '',
         tel: '',
@@ -37,21 +40,14 @@ export default {
       }
     }
   },
-  computed: {
-    test() {
-      return 'hehe'
-    }
-  },
   methods: {
     submit() {
-      // const res = this.$refs.myForm.validator()
-      // console.log(JSON.parse(JSON.stringify(this.vic)))
+      const res = this.$refs.myForm.validator()
       console.log('执行 submit 方法')
     }
   },
   created() {
     this.validateData = {
-      validateKey: 'vic',
       ref: 'myForm',
       formData: 'formData',
       fields: [ 'name', 'tel', 'habit' ],
@@ -59,11 +55,15 @@ export default {
         name: [
           {
             validator: 'required',
-            msg: '只接受数字'
+            msg: '必填'
           },
           {
-            validator: val => /^\d+$/.test(val),
-            msg: '只接受数字'
+            validator: val => /^[a-zA-Z]+$/.test(val),
+            msg: '只接受字母'
+          },
+          {
+            validator: 'max:8 min:5',
+            msg: '长度在 5 ~ 8 之间'
           }
         ],
         tel: [
@@ -74,15 +74,12 @@ export default {
         ],
         habit: [
           {
-            validator: val => val !== '',
+            validator: 'required',
             msg: '必填'
           }
         ]
       }
     }
-  },
-  mounted() {
-    console.log(this)
   }
 }
 </script>
@@ -102,5 +99,21 @@ li {
 }
 a {
   color: #42b983;
+}
+input, select {
+  border: 1px solid #555;
+  outline: none;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  width: 300px;
+}
+.error {
+  color: red;
+  border-color: red;
+}
+.error::-webkit-input-placeholder {
+  color: red;
 }
 </style>

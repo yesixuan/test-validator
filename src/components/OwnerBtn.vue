@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <button>{{ text }}</button><span>sdfg</span>
+  <div class="wrapper">
+    <button>{{ text }}</button>
   </div>
 </template>
 
@@ -17,5 +17,7 @@
 </script>
 
 <style scoped>
-
+.wrapper {
+  display: inline-block;
+}
 </style>

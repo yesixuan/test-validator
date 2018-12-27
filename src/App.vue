@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <HelloWorld  v-if="show" />
   </div>
 </template>
 
@@ -11,6 +11,19 @@ export default {
   name: 'app',
   components: {
     HelloWorld
+  },
+  data() {
+    return {
+      show: true
+    }
+  },
+  mounted() {
+    // setTimeout(() => {
+    //   console.log(this.show = false)
+    // }, 5000)
+    // setTimeout(() => {
+    //   console.log(this.show = true)
+    // }, 7000)
   }
 }
 </script>

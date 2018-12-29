@@ -1,5 +1,7 @@
 <template>
   <div class="hello">
+
+
     <form ref="myForm">
       <input placeholder="姓名" v-model="formData.name" name="name" :class="{ error: $isError('name') }" />
       <br>
@@ -9,15 +11,20 @@
         <option value="">空</option>
         <option value="1">睡觉</option>
         <option value="2">打豆豆</option>
+        <option value="3">错误选项</option>
       </select>
       <br>
-      <OwnerBtn text="保存" v-validate:submit.autoCatch="validateData" />
+      <!--<OwnerBtn text="保存" v-validate:submit.autoCatch="validateData" />-->
+      <OwnerBtn text="保存" v-validate:submit="validateData" />
     </form>
+
+
+
     <!--<button v-check-submit="submit">保存</button>-->
     <br><br><br><br><br><br><br><br><br><br><br><br><br>
-    {{ JSON.parse(JSON.stringify($verify('name'))) }}<br>
-    {{ JSON.parse(JSON.stringify($verify('tel'))) }}<br>
-    {{ JSON.parse(JSON.stringify($verify('habit'))) }}
+    姓名：{{ JSON.parse(JSON.stringify($verify('name'))) }}<br><br>
+    手机：{{ JSON.parse(JSON.stringify($verify('tel'))) }}<br><br>
+    爱好：{{ JSON.parse(JSON.stringify($verify('habit'))) }}
   </div>
 </template>
 
@@ -43,6 +50,7 @@ export default {
   methods: {
     submit() {
       const res = this.$refs.myForm.validator()
+      console.log(res)
       console.log('执行 submit 方法')
     }
   },
@@ -58,7 +66,7 @@ export default {
             msg: '必填'
           },
           {
-            validator: val => /^[a-zA-Z]+$/.test(val),
+            validator: /^[a-zA-Z]+$/,
             msg: '只接受字母'
           },
           {
@@ -68,6 +76,10 @@ export default {
         ],
         tel: [
           {
+            validator: 'required',
+            msg: '必填'
+          },
+          {
             validator: 'mobile',
             msg: '请输入正确的手机号码'
           }
@@ -76,6 +88,9 @@ export default {
           {
             validator: 'required',
             msg: '必填'
+          },
+          {
+            validator: val => val === '1' || val === '2'
           }
         ]
       }
@@ -86,20 +101,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 input, select {
   border: 1px solid #555;
   outline: none;

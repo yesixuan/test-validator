@@ -1,6 +1,6 @@
 import Vue from 'vue'
-// import validator, { rules }  from './plugins'
-import validator, { rules } from '@ignorance/vue-validator'
+import validator, { rules }  from './plugins'
+// import validator, { rules } from '@ignorance/vue-validator'
 import App from './App.vue'
 
 Vue.config.productionTip = false

@@ -67,8 +67,7 @@ export default {
           },
           {
             validator: /^[a-zA-Z]+$/,
-            msg: '只接受字母',
-            trigger: 'focus'
+            msg: '只接受字母'
           },
           {
             validator: 'max:8 min:5',
@@ -94,7 +93,7 @@ export default {
     }
   },
   mounted() {
-    console.log(this.$refs.myForm.name)
+    // console.log(this.$refs.myForm.name)
   }
 }
 </script>

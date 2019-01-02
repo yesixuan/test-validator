@@ -15,6 +15,7 @@ export default class Validator {
     this.autoCatch = !!modifiers.autoCatch
     this.submitMethod = this.vm[arg]
     this.prevTarget = null
+    this.listeners = [] // 所有绑定事件的监听者
     this.createReactiveData()
     // this.initEvent(el)
     this.initEachEvent(el)
@@ -73,8 +74,6 @@ export default class Validator {
   }
 
   createValidateData(res, name, target) {
-    console.log('res', JSON.stringify(res))
-    console.log('target', JSON.stringify(target))
     if (!res.pass && target.pass && res.validator !== target.validator) return
     Object.assign(res, target)
     this.vm.$set(this.$vec, name, target)
@@ -146,24 +145,23 @@ export default class Validator {
    * 这样定义方法才能保证该方法被添作事件监听者的时候 this 的指向符合预期
    * @param e
    */
-  changeListener = ({ target: { value, name } }) => {
-    this.verifySingle(value, this.rules[name], name)
-  }
+  // changeListener = ({ target: { value, name } }) => {
+  //   this.verifySingle(value, this.rules[name], name)
+  // }
 
-  focusListener = ({ target }) => {
-    if (target.nodeName === 'INPUT' || target.nodeName === 'SELECT' || target.nodeName === 'TEXTAREA') {
-      this.vm.$set(this.$vec, target.name, { pass: true })
-      // this.validateData[target.name] = { pass: true }
-      this.prevTarget = target
+  focusListener = ({ target: { nodeName, name } }) => {
+    if (nodeName === 'INPUT' || nodeName === 'SELECT' || nodeName === 'TEXTAREA') {
+      this.$vec[name] && this.vm.$set(this.$vec, name, { pass: true })
+      // this.prevTarget = target
     }
   }
 
-  blurListener = e => {
-    if (e.target !== this.prevTarget && this.prevTarget !== null) {
-      this.verifySingle(this.prevTarget.value, this.rules[this.prevTarget.name], this.prevTarget.name)
-      this.vm.$forceUpdate()
-    }
-  }
+  // blurListener = e => {
+  //   if (e.target !== this.prevTarget && this.prevTarget !== null) {
+  //     this.verifySingle(this.prevTarget.value, this.rules[this.prevTarget.name], this.prevTarget.name)
+  //     this.vm.$forceUpdate()
+  //   }
+  // }
 
   submitListener = e => {
     e.preventDefault()
@@ -177,15 +175,15 @@ export default class Validator {
     }
   }
 
-  initEvent(el) {
-    this.ref.addEventListener('change', this.changeListener)
-    // 当鼠标聚焦时，这个表单元素需要正常
-    this.ref.addEventListener('click', this.focusListener, true)
-    // 模拟 blur 事件
-    window.addEventListener('click', this.blurListener, true)
-    // 绑定提交事件
-    el.addEventListener('click', this.submitListener)
-  }
+  // initEvent(el) {
+  //   this.ref.addEventListener('change', this.changeListener)
+  //   // 当鼠标聚焦时，这个表单元素需要正常
+  //   this.ref.addEventListener('click', this.focusListener, true)
+  //   // 模拟 blur 事件
+  //   window.addEventListener('click', this.blurListener, true)
+  //   // 绑定提交事件
+  //   el.addEventListener('click', this.submitListener)
+  // }
 
   bindEvent(domName, rules) {
     const cloneRules = [ ...rules ]
@@ -197,6 +195,10 @@ export default class Validator {
         this.vm.$forceUpdate()
       }
       this.ref[domName].addEventListener(rule.trigger || 'blur', listener)
+      // 将解绑事件，添加到解绑列表中
+      this.listeners.push(() => {
+        this.ref[domName].removeEventListener(rule.trigger || 'blur', listener)
+      })
     })
   }
 
@@ -204,15 +206,18 @@ export default class Validator {
     Object.keys(this.rules).forEach(item => {
       this.bindEvent(item, this.rules[item])
     })
+    // 当鼠标聚焦时，这个表单元素需要正常
+    this.ref.addEventListener('click', this.focusListener, true)
     // 绑定提交事件
     el.addEventListener('click', this.submitListener)
   }
 
   unbindEvent(el) {
-    this.ref.removeEventListener('change', this.changeListener)
+    // this.ref.removeEventListener('change', this.changeListener)
     this.ref.removeEventListener('click', this.focusListener, true)
     el.removeEventListener('click', this.submitListener)
-    window.removeEventListener('click', this.blurListener, true)
+    // window.removeEventListener('click', this.blurListener, true)
+    this.listeners.forEach(fn => fn())
   }
 }
 

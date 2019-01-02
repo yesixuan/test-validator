@@ -18,12 +18,12 @@ export default {
     }
   },
   mounted() {
-    // setTimeout(() => {
-    //   console.log(this.show = false)
-    // }, 5000)
-    // setTimeout(() => {
-    //   console.log(this.show = true)
-    // }, 7000)
+    setTimeout(() => {
+      console.log(this.show = false)
+    }, 5000)
+    setTimeout(() => {
+      console.log(this.show = true)
+    }, 7000)
   }
 }
 </script>

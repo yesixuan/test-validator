@@ -16,8 +16,8 @@ export default class Validator {
     this.submitMethod = this.vm[arg]
     this.prevTarget = null
     this.createReactiveData()
-    this.initEvent(el)
-    // this.initPassData()
+    // this.initEvent(el)
+    this.initEachEvent(el)
   }
 
   /* 初始化响应式对象 */
@@ -56,6 +56,8 @@ export default class Validator {
     if (typeof validator === 'string') {
       if (defaultRules.rules[validator]) {
         return defaultRules.rules[validator]
+      } else if (validator === 'required') {
+        return val => !!val
       } else if (/^(m(ax|in):(\d+))(\sm(ax|in):(\d+)){0,1}$/.test(validator)) {
         return this.createLengthValidate(validator)
       } else {
@@ -71,6 +73,9 @@ export default class Validator {
   }
 
   createValidateData(res, name, target) {
+    console.log('res', JSON.stringify(res))
+    console.log('target', JSON.stringify(target))
+    if (!res.pass && target.pass && res.validator !== target.validator) return
     Object.assign(res, target)
     this.vm.$set(this.$vec, name, target)
   }
@@ -103,6 +108,18 @@ export default class Validator {
       }
     }
     saveRes({ pass: true, msg: '' })
+    return res
+  }
+
+  verifySingle2(val, rule, name) {
+    let res = this.$vec[name]
+    // 创建偏函数，接收部分参数
+    const saveRes = partial(this.createValidateData.bind(this), res, name)
+    if (!this.createValidator(rule.validator)(val)) {
+      saveRes({ pass: false, msg: rule.msg || '默认校验不通过消息', validator: rule.validator })
+      return res
+    }
+    saveRes({ pass: true, msg: '', validator: rule.validator })
     return res
   }
 
@@ -140,6 +157,13 @@ export default class Validator {
     }
   }
 
+  blurListener = e => {
+    if (e.target !== this.prevTarget && this.prevTarget !== null) {
+      this.verifySingle(this.prevTarget.value, this.rules[this.prevTarget.name], this.prevTarget.name)
+      this.vm.$forceUpdate()
+    }
+  }
+
   submitListener = e => {
     e.preventDefault()
     if (this.autoCatch) {
@@ -152,21 +176,32 @@ export default class Validator {
     }
   }
 
-  blurListener = e => {
-    if (e.target !== this.prevTarget && this.prevTarget !== null) {
-      this.verifySingle(this.prevTarget.value, this.rules[this.prevTarget.name], this.prevTarget.name)
-      this.vm.$forceUpdate()
-    }
-  }
-
   initEvent(el) {
     this.ref.addEventListener('change', this.changeListener)
     // 当鼠标聚焦时，这个表单元素需要正常
     this.ref.addEventListener('click', this.focusListener, true)
-    // 绑定提交事件
-    el.addEventListener('click', this.submitListener)
     // 模拟 blur 事件
     window.addEventListener('click', this.blurListener, true)
+    // 绑定提交事件
+    el.addEventListener('click', this.submitListener)
+  }
+
+  bindEvent(domName, rules) {
+    rules.reverse().forEach(rule => {
+      const listener = ({ target }) => {
+        this.verifySingle2(target.value, rule, domName)
+        this.vm.$forceUpdate()
+      }
+      this.ref[domName].addEventListener(rule.trigger || 'blur', listener)
+    })
+  }
+
+  initEachEvent(el) {
+    Object.keys(this.rules).forEach(item => {
+      this.bindEvent(item, this.rules[item])
+    })
+    // 绑定提交事件
+    el.addEventListener('click', this.submitListener)
   }
 
   unbindEvent(el) {

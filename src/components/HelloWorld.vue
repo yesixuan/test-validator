@@ -76,10 +76,6 @@ export default {
         ],
         tel: [
           {
-            validator: 'required',
-            msg: '必填'
-          },
-          {
             validator: 'mobile',
             msg: '请输入正确的手机号码'
           }
@@ -95,6 +91,9 @@ export default {
         ]
       }
     }
+  },
+  mounted() {
+    console.log(this.$refs.myForm.name)
   }
 }
 </script>

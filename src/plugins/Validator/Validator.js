@@ -115,7 +115,8 @@ export default class Validator {
     let res = this.$vec[name]
     // 创建偏函数，接收部分参数
     const saveRes = partial(this.createValidateData.bind(this), res, name)
-    if (!this.createValidator(rule.validator)(val)) {
+    // 第一个条件用来排除 值为空，并且非必填 的情况（该情况无需校验其他规则）
+    if (!(val === '' && !this.ref[name].required) && !this.createValidator(rule.validator)(val)) {
       saveRes({ pass: false, msg: rule.msg || '默认校验不通过消息', validator: rule.validator })
       return res
     }
@@ -187,7 +188,10 @@ export default class Validator {
   }
 
   bindEvent(domName, rules) {
-    rules.reverse().forEach(rule => {
+    const cloneRules = [ ...rules ]
+    // 将是否必填的信息保存起来
+    this.ref[domName].required = cloneRules.some(rule => rule.validator === 'required')
+    cloneRules.reverse().forEach(rule => {
       const listener = ({ target }) => {
         this.verifySingle2(target.value, rule, domName)
         this.vm.$forceUpdate()

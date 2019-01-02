@@ -67,7 +67,8 @@ export default {
           },
           {
             validator: /^[a-zA-Z]+$/,
-            msg: '只接受字母'
+            msg: '只接受字母',
+            trigger: 'focus'
           },
           {
             validator: 'max:8 min:5',

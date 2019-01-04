@@ -22,9 +22,10 @@
 
     <!--<button v-check-submit="submit">保存</button>-->
     <br><br><br><br><br><br><br><br><br><br><br><br><br>
-    姓名：{{ JSON.parse(JSON.stringify($verify('name'))) }}<br><br>
+    姓名：{{ $verify('name').msg }}<br><br>
     手机：{{ JSON.parse(JSON.stringify($verify('tel'))) }}<br><br>
-    爱好：{{ JSON.parse(JSON.stringify($verify('habit'))) }}
+    爱好：{{ JSON.parse(JSON.stringify($verify('habit'))) }}<br><br>
+    所有： {{ $verify() }}
   </div>
 </template>
 

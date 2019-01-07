@@ -12,7 +12,7 @@ const createLengthValidate = rule => {
   return ({length}) => !((min && ~~min > length) || (max && ~~max < length))
 }
 
-const createValidator = validator => {
+export const createValidator = validator => {
   if (typeof validator === 'string') {
     if (defaultRules.rules[validator]) {
       return defaultRules.rules[validator]
@@ -32,14 +32,8 @@ const createValidator = validator => {
   }
 }
 
-/**
- * 从后面往前面校验，一旦遇到校验不通过，就更新消息并返回。for 循环之后，返回正常消息
- * @param name
- * @param value
- * @param rules
- */
 export const verifySingle = (name, value, rules) => {
-  rules = [ ...rules ]
+  Array.isArray(rules) ? rules = [ ...rules ] : [ rules ]
   const required = rules.some(rule => rule.validator === 'required')
   for (let i = 0; i < rules.length; i++) {
     const { msg, validator } = rules[i]
@@ -53,6 +47,37 @@ export const verifySingle = (name, value, rules) => {
 }
 
 export const verifyAll = (data, ruleConfig) => {
-  const result = Object.keys(data).reduce((res, name) => res[name] = verifySingle(name, data[name], ruleConfig[name]), {})
+  const result = Object.keys(data).reduce((res, name) => (res[name] = verifySingle(name, data[name], ruleConfig[name])) && res, {})
   console.log('result', result)
+  return result
 }
+
+const formData = {
+  name: 'asas',
+  age: '12'
+}
+
+const ruleConfig = {
+  name: [
+    {
+      validator: 'required',
+      msg: '必填'
+    },
+    {
+      validator: 'min:2 max:6',
+      msg: '长度在 2 ~ 6 之间'
+    }
+  ],
+  age: [
+    {
+      validator: 'required',
+      msg: '必填'
+    },
+    {
+      validator: val => +val >= 20,
+      msg: '长度在 2 ~ 6 之间'
+    }
+  ]
+}
+
+verifyAll(formData, ruleConfig)

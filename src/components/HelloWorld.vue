@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import '../pure-validate'
 import OwnerInput from './OwnerInput'
 import OwnerBtn from './OwnerBtn'
 export default {
